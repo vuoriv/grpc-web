@@ -30,8 +30,7 @@ const module = {};
  var echoApp = new echoapp.EchoApp(
    echoService,
    {
-     EchoRequest: proto.grpc.gateway.testing.EchoRequest,
-     ServerStreamingEchoRequest: proto.grpc.gateway.testing.ServerStreamingEchoRequest
+     EchoRequest: proto.grpc.gateway.testing.EchoRequest
    },
    {
      checkGrpcStatusCode: function(status) {

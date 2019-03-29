@@ -87,58 +87,6 @@ echoapp.EchoApp.prototype.echo = function(msg) {
 };
 
 /**
- * @param {string} msg
- */
-echoapp.EchoApp.prototype.echoError = function(msg) {
-  echoapp.EchoApp.addLeftMessage(msg);
-  var unaryRequest = new this.ctors.EchoRequest();
-  unaryRequest.setMessage(msg);
-  this.echoService.echoAbort(unaryRequest, {}, function(err, response) {
-    if (err) {
-      echoapp.EchoApp.addRightMessage('Error code: '+err.code+' "'+
-                                      err.message+'"');
-    }
-  });
-};
-
-/**
- * @param {string} msg
- * @param {number} count
- */
-echoapp.EchoApp.prototype.repeatEcho = function(msg, count) {
-  echoapp.EchoApp.addLeftMessage(msg);
-  if (count > echoapp.EchoApp.MAX_STREAM_MESSAGES) {
-    count = echoapp.EchoApp.MAX_STREAM_MESSAGES;
-  }
-  var streamRequest = new this.ctors.ServerStreamingEchoRequest();
-  streamRequest.setMessage(msg);
-  streamRequest.setMessageCount(count);
-  streamRequest.setMessageInterval(echoapp.EchoApp.INTERVAL);
-
-  var stream = this.echoService.serverStreamingEcho(
-    streamRequest,
-    {"custom-header-1": "value1"});
-  var self = this;
-  stream.on('data', function(response) {
-    echoapp.EchoApp.addRightMessage(response.getMessage());
-  });
-  stream.on('status', function(status) {
-    self.handlers.checkGrpcStatusCode(status);
-    if (status.metadata) {
-      console.log("Received metadata");
-      console.log(status.metadata);
-    }
-  });
-  stream.on('error', function(err) {
-    echoapp.EchoApp.addRightMessage('Error code: '+err.code+' "'+
-                                    err.message+'"');
-  });
-  stream.on('end', function() {
-    console.log("stream end signal received");
-  });
-};
-
-/**
  * @param {Object} e event
  * @return {boolean} status
  */

@@ -18,7 +18,6 @@
 
 var PROTO_PATH = __dirname + '/../echo.proto';
 
-var async = require('async');
 var _ = require('lodash');
 var grpc = require('grpc');
 var protoLoader = require('@grpc/proto-loader');
@@ -56,36 +55,8 @@ function doEcho(call, callback) {
   }, copyMetadata(call));
 }
 
-/**
- * @param {!Object} call
- * @param {function():?} callback
- */
-function doEchoAbort(call, callback) {
-  callback({
-    code: grpc.status.ABORTED,
-    message: 'Aborted from server side.'
-  });
-}
-
-/**
- * @param {!Object} call
- */
-function doServerStreamingEcho(call) {
-  var senders = [];
-  function sender(message, interval) {
-    return (callback) => {
-      call.write({
-        message: message
-      });
-      _.delay(callback, interval);
-    };
-  }
-  for (var i = 0; i < call.request.message_count; i++) {
-    senders[i] = sender(call.request.message, call.request.message_interval);
-  }
-  async.series(senders, () => {
-    call.end(copyMetadata(call));
-  });
+function reverseString(str) {
+    return str.split("").reverse().join("");
 }
 
 /**
@@ -96,9 +67,7 @@ function doServerStreamingEcho(call) {
 function getServer() {
   var server = new grpc.Server();
   server.addService(echo.EchoService.service, {
-    echo: doEcho,
-    echoAbort: doEchoAbort,
-    serverStreamingEcho: doServerStreamingEcho,
+    echo: doEcho
   });
   return server;
 }

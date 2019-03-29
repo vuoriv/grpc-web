@@ -9,9 +9,12 @@ services:
     build:
       context: ./
       dockerfile: ./net/grpc/gateway/docker/node_server/Dockerfile
+    command: bash -c "cd /github/grpc-web/net/grpc/gateway/examples/echo/node-server && npm install; node /github/grpc-web/net/grpc/gateway/examples/echo/node-server/server.js"
     depends_on:
       - common
     image: grpcweb/node-server
+    volumes:
+      - ./net/grpc/gateway/examples/echo:/github/grpc-web/net/grpc/gateway/examples/echo
     ports:
       - "9090:9090"
   envoy:
@@ -27,8 +30,11 @@ services:
     build:
       context: ./
       dockerfile: ./net/grpc/gateway/docker/commonjs_client/Dockerfile
+    command: bash -c "protoc -I=/github/grpc-web/net/grpc/gateway/examples/echo echo.proto --js_out=import_style=commonjs:/github/grpc-web/net/grpc/gateway/examples/echo/commonjs-example --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/github/grpc-web/net/grpc/gateway/examples/echo/commonjs-example; cd /github/grpc-web/net/grpc/gateway/examples/echo/commonjs-example && npm install && npx webpack && cp echotest.html /var/www/html && cp dist/main.js /var/www/html/dist; python -m SimpleHTTPServer 8081"
     depends_on:
       - common
     image: grpcweb/commonjs-client
+    volumes:
+      - ./net/grpc/gateway/examples/echo:/github/grpc-web/net/grpc/gateway/examples/echo
     ports:
       - "8081:8081"

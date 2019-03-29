@@ -28,8 +28,7 @@ var echoService = new EchoServiceClient('http://'+window.location.hostname+':808
 var echoApp = new EchoApp(
   echoService,
   {
-    EchoRequest: EchoRequest,
-    ServerStreamingEchoRequest: ServerStreamingEchoRequest
+    EchoRequest: EchoRequest
   },
   {
     checkGrpcStatusCode: function(status) {
